@@ -5,8 +5,21 @@ const app = express()
 
 app.use(express.json())
 
-
 const costumers = []
+
+function verifyIfExistsAccountCPF (req, res, next) {
+    const { cpf } = req.params
+
+    const costumer = costumers.find(costumer => costumer.cpf === cpf)
+    
+    if(!costumer){
+        return res.status(400).json({ ok: false})
+    }
+
+    req.costumer = costumer
+
+    next()
+}
 
 app.post('/sign-up', (req, res) => {
     const { name, cpf } = req.body
@@ -28,14 +41,9 @@ app.post('/sign-up', (req, res) => {
     return res.status(201).json({ ok: true })
 })
 
-app.get('/statement/:cpf', (req, res) => {
-    const { cpf } = req.params
+app.get('/statement/:cpf', verifyIfExistsAccountCPF,(req, res) => {
 
-    const costumer = costumers.find(costumer => costumer.cpf === cpf)
-
-    if(!costumer){
-        return res.status(400).json({ ok: false})
-    }
+    const { costumer } = req
 
     return res.status(201).json(costumer.statement)
 })
