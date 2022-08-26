@@ -11,7 +11,8 @@ const costumers = []
 app.post('/sign-up', (req, res) => {
     const { name, cpf } = req.body
 
-    const cpfAlreadyExists = costumers.some((costumer) => costumer.cpf === cpf)
+    // Some retorna true ou false
+    const cpfAlreadyExists = costumers.some(costumer => costumer.cpf === cpf)
 
     if(cpfAlreadyExists){
         return res.status(400).json({ ok: false })
@@ -25,6 +26,18 @@ app.post('/sign-up', (req, res) => {
     })
 
     return res.status(201).json({ ok: true })
+})
+
+app.get('/statement/:cpf', (req, res) => {
+    const { cpf } = req.params
+
+    const costumer = costumers.find(costumer => costumer.cpf === cpf)
+
+    if(!costumer){
+        return res.status(400).json({ ok: false})
+    }
+
+    return res.status(201).json(costumer.statement)
 })
 
 app.listen(3333, () => {
