@@ -103,9 +103,29 @@ app.get('/statement/:cpf/date', verifyIfExistsAccountCPF,(req, res) => {
 
     const dateFormat = new Date(date + ' 00:00')
 
-    const statement = costumer.statement.filter(statement => statement.created_at.toDateString() === new Date(dateFormat).toDateString())
+    const statement = costumer.statement.filter(statement =>
+         statement.created_at.toDateString() === 
+         new Date(dateFormat).toDateString())
 
     return res.status(201).json(statement)
+})
+
+app.put('/account/:cpf', verifyIfExistsAccountCPF,(req, res) => {
+
+    const { name } = req.body
+
+    const { costumer } = req
+
+    costumer.name = name 
+
+    return res.status(201).json({ ok: true })
+})
+
+app.get('/account/:cpf', verifyIfExistsAccountCPF,(req, res) => {
+
+    const { costumer } = req
+ 
+    return res.status(201).json({ ok: true, data: costumer })
 })
 
 app.listen(3333, () => {
