@@ -22,7 +22,15 @@ function verifyIfExistsAccountCPF (req, res, next) {
 }
 
 function getBalance(statement){
+    const balance = statement.reduce((acc, operation) => {
+        if (operation.type === 'credit') {
+            return acc + operation.amount
+        } else {
+            return acc - operation.amount
+        }
+    }, 0)
 
+    return balance
 }
 
 app.post('/sign-up', (req, res) => {
@@ -71,7 +79,7 @@ app.post('/deposit/:cpf', verifyIfExistsAccountCPF,(req, res) => {
 })
 
 app.post('/withdraw/:cpf', verifyIfExistsAccountCPF,(req, res) => {
-    
+
     const { amount } = req.body
 
     const { costumer } = req
@@ -121,11 +129,22 @@ app.put('/account/:cpf', verifyIfExistsAccountCPF,(req, res) => {
     return res.status(201).json({ ok: true })
 })
 
-app.get('/account/:cpf', verifyIfExistsAccountCPF,(req, res) => {
+app.delete('/account/:cpf', verifyIfExistsAccountCPF,(req, res) => {
 
     const { costumer } = req
+
+    costumers.splice(costumer, 1)
  
-    return res.status(201).json({ ok: true, data: costumer })
+    return res.status(200).json({ ok: true, data: costumers })
+})
+
+app.get('/balance/:cpf', verifyIfExistsAccountCPF,(req, res) => {
+
+    const { costumer } = req
+
+    const balance = getBalance(costumer.statement)
+ 
+    return res.status(200).json({ ok: true, data: balance })
 })
 
 app.listen(3333, () => {
